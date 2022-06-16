@@ -57,10 +57,10 @@ def logmelspec(signal: Signal1D[T], n: int, f_max: float, d: int) -> Signal[T]:
     )
     log.debug(f"{melspec.shape=}")
     return Signal(
-        lb.power_to_db(melspec, ref=np.max).astype(signal.dtype).T,
+        lb.power_to_db(melspec, ref=np.max).astype(signal.dtype).T,  # pyright: ignore
         signal.sr / d,
         signal.annotations,
-    )  # pyright: ignore  # noqa
+    )
 
 
 # def classic_lpc_pipeline(sound, sampling_rate, downsampling_coef, ecog_size, order):
