@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Optional
 
 import librosa as lb  # type: ignore
 import librosa.feature as lbf  # type: ignore
@@ -14,12 +14,14 @@ from . import Signal, Signal1D, T
 log = logging.getLogger(__name__)
 
 
-def asd(signal: Signal, n: Optional[int] = None) -> tuple[npt.NDArray[Any], npt.NDArray]:
+def asd(signal: Signal, n: Optional[int] = None) -> tuple[npt.NDArray, npt.NDArray]:
     """
-    Compute amplitude spectral density along the last axis
+    Compute amplitude spectral density
 
     Parameters
     ----------
+    signal: Signal
+        Input signal
     n: int, optional
         Signal length in samples; if doesn't equal len(signal), the signal
         is cropped or padded to match n (see numpy.fft.fft)
@@ -38,10 +40,10 @@ def asd(signal: Signal, n: Optional[int] = None) -> tuple[npt.NDArray[Any], npt.
 
     """
     apm_spec = np.abs(np.fft.fft(signal.data, n, axis=0))
-    n = signal.data.shape[-1] if n is None else n
+    n = signal.n_samples if n is None else n
     freqs = np.fft.fftfreq(n, 1 / signal.sr)
     end = len(freqs) // 2
-    assert n // 2 == end, f"{n=}, {end=}, {signal.data.shape=}, {freqs=}"
+    assert n // 2 == end, f"{n=}, {end=}, {signal.n_samples=}, {freqs=}"
     return freqs[:end], apm_spec[..., :end]
 
 
