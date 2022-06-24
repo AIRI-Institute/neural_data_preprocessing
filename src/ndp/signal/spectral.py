@@ -44,7 +44,7 @@ def asd(signal: Signal, n: Optional[int] = None) -> tuple[npt.NDArray, npt.NDArr
     freqs = np.fft.fftfreq(n, 1 / signal.sr)
     end = len(freqs) // 2
     assert n // 2 == end, f"{n=}, {end=}, {signal.n_samples=}, {freqs=}"
-    return freqs[:end], apm_spec[..., :end]
+    return freqs[:end], apm_spec[:end, :]
 
 
 def mfccs(signal: Signal, d: int, out_nsamp: int, n_mfcc: int) -> npt.NDArray:
