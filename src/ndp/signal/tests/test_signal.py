@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from ndp.signal import Annotation, Signal
-from ndp.signal.annotations import drop_bad_segments, split_into_good_segments
+from ndp.signal import Signal, drop_bad_segments, split_into_good_segments
+from ndp.signal.annotations import Annotation
 
 
 @pytest.fixture(params=[np.float128, np.float64, np.float32, np.float16])
