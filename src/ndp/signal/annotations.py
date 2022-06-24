@@ -16,7 +16,7 @@ class Annotation(NamedTuple):
     def as_mask(self, sr: float, nsamp: int) -> SignalMaskArray:
         res = np.zeros(nsamp, dtype=np.bool_)
         start = round(self.onset * sr)
-        end = round((self.onset + self.duration) * sr)
+        end = round((self.onset + self.duration) * sr) + 1
         res[start:end] = True
         return res
 
