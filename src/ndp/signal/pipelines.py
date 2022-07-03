@@ -10,8 +10,7 @@ import scipy.interpolate as sci  # type: ignore
 import scipy.signal as scs  # type: ignore
 import sklearn.preprocessing as skp  # type: ignore
 
-from . import Signal, Signal1D, T
-from .annotations import drop_bad_segments
+from . import Signal, Signal1D, T, drop_bad_segments
 from .filtering import ButterFiltFilt, moving_avarage, notch_narrow, notch_wide
 from .spectral import logmelspec
 
@@ -22,6 +21,9 @@ Signal1DProcessor = Callable[[Signal1D[T]], Signal[T]]
 
 
 def compose_processors(*functions: SignalProcessor[T]) -> SignalProcessor[T]:
+    # when empty return identity function
+    if not functions:
+        return lambda x: x
     return reduce(lambda f, g: lambda x: g(f(x)), functions)
 
 
@@ -97,11 +99,11 @@ def preprocess_ecog(
     ecog = scs.decimate(ecog.data, dsamp_coef, axis=0)
     new_sr = int(ecog.sr / dsamp_coef)
 
-    ecog = (filter(ecog, highpass, lowpass, order=5))
+    ecog = filter(ecog, highpass, lowpass, order=5)
     for p in notch_narrow_freqs:
-        ecog = (notch_narrow(ecog, p))
+        ecog = notch_narrow(ecog, p)
     for p in notch_wide_freqs:
-        ecog = (notch_wide(ecog, p))
+        ecog = notch_wide(ecog, p)
 
     return Signal(skp.scale(ecog).astype("float32"), new_sr)
 
@@ -119,14 +121,16 @@ def melspectrogram_pipeline(
     log.debug(f"{melspec_scaled.data.shape=}")
     if melspec_scaled.ndim == 1:
         melspec_scaled = melspec_scaled[:, np.newaxis]
-    return Signal(melspec_scaled, melspec.sr, signal.annotations)
+    return Signal(melspec_scaled, melspec.sr, melspec.annotations)
 
 
 def align_samples(sig_from: Signal[T], sig_to: Signal[T]) -> Signal[T]:
     log.info("Aligning samples")
     log.info(f"{str(sig_from)=}")
     log.info(f"{str(sig_to)=}")
-    assert abs(sig_from.duration - sig_to.duration) < 0.01
+    assert (
+        abs(sig_from.duration - sig_to.duration) < 0.05
+    ), f"{sig_from.duration=}, {sig_to.duration=}"
     if len(sig_from) == len(sig_to) and sig_from.sr == sig_from.sr:
         return sig_to
     samp_from = np.arange(len(sig_from))
