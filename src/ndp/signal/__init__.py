@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar, overload
 
@@ -7,6 +8,8 @@ import numpy as np
 import numpy.typing as npt
 
 from .annotations import Annotation, Annotations
+
+log = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=npt.NBitBase)
 SignalArray = npt.NDArray[np.floating[T]]  # array of shape (n_samples, n_sensors)
@@ -117,6 +120,7 @@ def split_into_good_segments(signal: Signal[T], round_annot_times: bool = True) 
 
 
 def drop_bad_segments(signal: Signal[T], round_annot_times: bool = True) -> Signal[T]:
+    log.debug(f"Drop bad segments: received signal: {str(signal)}")
     normalized_annots = _AnnotationsOverlapProcessor(signal.annotations).normalize_bad_segments()
     removed_dur = 0.0
     new_annots: Annotations = []

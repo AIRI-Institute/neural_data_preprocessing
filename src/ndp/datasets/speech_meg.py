@@ -36,6 +36,9 @@ def read(subject: Subject) -> tuple[Signal[npt._32Bit], Signal1D[npt._32Bit], In
     Y = _read_wav(subject.audio_path)
     Y.annotations = X.annotations
     assert abs(X.duration - Y.duration) < 0.01, "inconsistent durations for audio and MEG"
+    log.info(f"Loaded X={str(X)}")
+    log.info(f"Loaded Y={str(Y)}")
+    log.debug(f"Loaded info={info}")
     return X, Y, info
 
 
