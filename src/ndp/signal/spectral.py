@@ -55,7 +55,12 @@ def mfccs(signal: Signal, d: int, out_nsamp: int, n_mfcc: int) -> npt.NDArray:
 
 def logmelspec(signal: Signal1D[T], n: int, f_max: float, d: int) -> Signal[T]:
     melspec = lbf.melspectrogram(
-        y=np.squeeze(np.asarray(signal)), sr=int(signal.sr), n_mels=n, fmax=f_max, hop_length=d
+        y=np.squeeze(np.asarray(signal)),
+        sr=int(signal.sr),
+        n_mels=n,
+        fmax=f_max,
+        hop_length=d,
+        n_fft=1024,
     )
     log.debug(f"{melspec.shape=}")
     return Signal(
